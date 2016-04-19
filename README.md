@@ -48,3 +48,61 @@ drwxr-xr-x    2 102      105           4096 Apr 19 11:09 generated.configs
 drwxr-xr-x    2 102      105           4096 Apr 19 11:09 kv_vnode
 drwxr-xr-x    2 102      105           4096 Apr 19 11:09 ring
 ```
+
+# Configuring Riak using the 'riak-admin' command within the instance
+
+Lets take the example of creating a 'Map' [CRDT](https://docs.basho.com/riak/kv/2.1.4/developing/data-types/#setting-up-buckets-to-use-riak-data-types).
+
+First, lets attach to the running instance:
+
+```
+docker exec -ti -u riak furious_stallman /bin/bash                       (git)-[master]-
+```
+
+We then Create and activate the bucket-type:
+
+```
+riak@1f8f6a4cb989:/$ riak-admin bucket-type create maps '{"props":{"datatype":"map"}}'
+maps created
+
+WARNING: After activating maps, nodes in this cluster
+can no longer be downgraded to a version of Riak prior to 2.0
+riak@1f8f6a4cb989:/$ riak-admin bucket-type activate maps
+maps has been activated
+
+WARNING: Nodes in this cluster can no longer be
+downgraded to a version of Riak prior to 2.0
+```
+
+Detach from the container and run the following command to test CRDT functionality is working correctly:
+
+```
+RIAK_HOST=192.168.201.128
+
+curl -X POST http://$RIAK_HOST:8098/types/maps/buckets/example/datatypes/cart \
+-H"content-type: application/json" \
+-d '
+{
+   "update" : {
+      "purchase_set" : {
+         "add_all" : [
+            "newcomputer:900",
+            "newphone:900"
+         ]
+      },
+      "updates_counter" : 1
+   }
+}
+'
+```
+
+No errors, that's a good sign. Run curl with '-vvv' flags if you want verbose output.
+
+Let's try retrieving that value:
+
+```
+curl -X GET http://$RIAK_HOST:8098/types/maps/buckets/example/datatypes/cart
+{"type":"map","value":{"purchase_set":["newcomputer:900","newphone:900"],"updates_counter":1},"context":"g2wAAAABaAJtAAAADCMJ/vnwim0NAABOIWEBag=="}% 
+```
+
+Success, feel free to add CRDT to your Linkedin profile.
