@@ -1,11 +1,6 @@
-
-On branch master
-Your branch is up-to-date with 'origin/master'.
-Changes to be committed:
-  (use "git reset HEAD <file>..." to unstage)
-
-	new file:   .dockerignore
-	new file:   Dockerfile
-	modified:   README.md
-	new file:   supervisord.conf
-
+.git
+.gitignore
+Dockerfile
+LICENSE
+README.md
+codeship.aes

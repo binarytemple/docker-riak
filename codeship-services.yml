@@ -1,0 +1,5 @@
+app:
+  build:
+    image: binarytemple/riak
+    dockerfile_path: Dockerfile
+  environment:
